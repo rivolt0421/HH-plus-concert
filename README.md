@@ -24,6 +24,9 @@
    - 배포 전략 도입
    - 최종 문서화
 
+### API 명세
+
+[Concert Ticketing API](https://rivolt0421.github.io/HH-plus-concert/)
 
 ### Sequence Diagram
 
