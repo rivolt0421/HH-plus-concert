@@ -150,24 +150,24 @@ sequenceDiagram
   P ->> P: 결제 처리
   alt 지불 성공
     Note left of U: 지불 성공
-    P ->> S: 결제 완료 콜백 (w/ 예약 정보, 세션 정보)
+    P ->> S: 결제 완료 콜백 (w/ 결제 정보, 좌석 id, 세션 id)
     deactivate P
     activate S
-    S ->> D: 예약 정보 확인
+    S ->> D: 좌석 예약 정보 조회
     activate D
-    D -->> S: 예약 정보 반환
-    alt 유효한 예약 존재
-      Note over U: 유효한 예약 존재
-      S ->> D: 결제 정보 생성
+    D -->> S: 좌석 예약 정보 반환
+    alt 사용자의 유효한 예약 존재
+      Note over U: 사용자의 유효한 예약 존재
+      S ->> D: 결제 정보 생성 (w/ 좌석 버전)
       alt 결제 정보 생성 성공
       Note right of U: 결제 정보 생성 성공
         D -->> S: 성공
         S ->> D: 세션 만료 처리
-        D -->> S: 세션 만료 완료
+        D -->> S: 처리 완료
         deactivate D
         S -->> U: 결제 성공 응답
         deactivate S
-      else 결제 정보 생성 실패 (unique 제약 위반)
+      else 결제 정보 생성 실패
         Note right of U: 결제 정보 생성 실패
         D -->> S: 실패
         activate S
@@ -178,8 +178,8 @@ sequenceDiagram
         S -->> U: 예약 실패 안내
         deactivate S
       end
-    else 유효한 예약 없음
-      Note over U: 유효한 예약 없음
+    else 사용자의 유효한 예약 없음
+      Note over U: 사용자의 유효한 예약 없음
       S ->> P: 결제 취소 요청
       activate S
       activate P
@@ -191,7 +191,6 @@ sequenceDiagram
   else 지불 실패
     Note left of U: 지불 실패
     P -->> U: 결제 실패 응답
-
   end
 ```
 
