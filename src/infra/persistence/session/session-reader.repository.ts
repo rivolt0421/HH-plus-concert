@@ -1,6 +1,6 @@
 import { PrismaService } from 'src/database/prisma.service';
-import { Session } from 'src/domain/session/entity/session';
-import { SessionReaderRepository } from 'src/domain/session/repository/session-reader.interface';
+import { Session } from 'src/domain/queue/entity/session';
+import { SessionReaderRepository } from 'src/domain/queue/repository/session-reader.interface';
 
 export class SessionReaderRepositoryImpl implements SessionReaderRepository {
   constructor(private readonly prisma: PrismaService) {}

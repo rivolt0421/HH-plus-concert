@@ -1,5 +1,5 @@
 import { PrismaService } from 'src/database/prisma.service';
-import { SessionCounterWriterRepository } from 'src/domain/session/repository/session-counter-writer.interface';
+import { SessionCounterWriterRepository } from 'src/domain/queue/repository/session-counter-writer.interface';
 
 export class SessionCounterWriterRepositoryImpl
   implements SessionCounterWriterRepository

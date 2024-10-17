@@ -1,6 +1,6 @@
 import { PrismaService } from 'src/database/prisma.service';
-import { Session } from 'src/domain/session/entity/session';
-import { SessionWriterRepository } from 'src/domain/session/repository/session-writer.interface';
+import { Session } from 'src/domain/queue/entity/session';
+import { SessionWriterRepository } from 'src/domain/queue/repository/session-writer.interface';
 
 export class SessionWriterRepositoryImpl implements SessionWriterRepository {
   constructor(private readonly prisma: PrismaService) {}
