@@ -4,7 +4,6 @@ import {
   SEAT_READER_REPOSITORY,
   SeatReaderRepository,
 } from '../repository/seat-reader.interface';
-import { Reservation } from '../entity/reservation';
 
 export class SeatService {
   constructor(
@@ -25,18 +24,15 @@ export class SeatService {
     return seat;
   }
 
-  async validateForPayment(
-    seatId: number,
-    userId: number,
-  ): Promise<{ seat: Seat; reservation: Reservation }> {
+  async validateForPayment(seatId: number, userId: number): Promise<Seat> {
     const seat = await this.seatReader.findByIdOrThrow(seatId);
 
-    const reservation = seat.getPendingReservationOf(userId);
+    const pendingReservation = seat.getPendingReservationOf(userId);
 
-    if (reservation === null) {
-      throw new Error('Pending reservation not exists');
+    if (pendingReservation === null) {
+      throw new Error('PENDING_RESERVATION_NOT_EXISTS');
     }
 
-    return { seat, reservation };
+    return seat;
   }
 }

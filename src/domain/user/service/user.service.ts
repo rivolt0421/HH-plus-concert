@@ -23,6 +23,10 @@ export class UserService {
     private readonly pointHistoryWriter: PointHistoryWriterRepository,
   ) {}
 
+  async findById(userId: number): Promise<User> {
+    return this.userReader.findByIdOrThrow(userId);
+  }
+
   async findByEmailAndPassword(email: string, password: string): Promise<User> {
     const user = await this.userReader.findByEmailAndPasswordOrThrow(
       email,

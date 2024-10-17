@@ -30,7 +30,7 @@ export class ReservationService {
     );
 
     if (savedReservation === null) {
-      throw new Error('Reservation failed');
+      throw new Error('RESERVATION_FAILED');
     }
 
     return savedReservation;
@@ -45,8 +45,19 @@ export class ReservationService {
 
     reservation.markAsPaid(paymentId);
 
-    await this.reservationWriter.saveWithSeatVersion(reservation, seatVersion);
+    const savedReservation = await this.reservationWriter.saveWithSeatVersion(
+      reservation,
+      seatVersion,
+    );
 
-    return reservation;
+    if (savedReservation === null) {
+      throw new Error('MARK_AS_PAID_FAILED');
+    }
+
+    return savedReservation;
+  }
+
+  async findByIdOrThrow(id: number): Promise<Reservation> {
+    return this.reservationReader.findByIdOrThrow(id);
   }
 }

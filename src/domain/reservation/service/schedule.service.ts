@@ -11,7 +11,7 @@ export class ScheduleService {
     private readonly scheduleReader: ScheduleReaderRepository,
   ) {}
 
-  getAvailableDates(): Promise<string[]> {
+  async getAvailableDates(): Promise<string[]> {
     return this.scheduleReader.findAllDates();
   }
 

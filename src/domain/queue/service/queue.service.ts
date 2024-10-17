@@ -39,6 +39,10 @@ export class QueueService {
     return session;
   }
 
+  async getSession(sessionId: number): Promise<Session> {
+    return this.sessionReader.getByIdOrThrow(sessionId);
+  }
+
   async getRemainingCountOf(sessionId: number): Promise<number> {
     const session = await this.sessionReader.getByIdOrThrow(sessionId);
     const counter = await this.sessionCounterReader.get();

@@ -14,25 +14,25 @@ import {
 } from '@nestjs/common';
 import {
   ChargePointSwagger,
+  CompletePaymentSwagger,
   EnterQueueSwagger,
   GetAvailableDatesSwagger,
   GetAvailableSeatsSwagger,
   GetPointSwagger,
   GetQueuePositionSwagger,
-  ProcessPaymentSwagger,
   ReserveSeatSwagger,
 } from './app.controller.decorator';
 import { AppService } from './app.service';
 import {
   ChargePointReq,
+  CompletePaymentReq,
+  CompletePaymentRes,
   EnterQueueReq,
   EnterQueueRes,
   GetAvailableDatesRes,
   GetAvailableSeatsRes,
   GetPointRes,
   GetQueuePositionRes,
-  ProcessPaymentReq,
-  ProcessPaymentRes,
   ReserveSeatReq,
   ReserveSeatRes,
 } from './dto';
@@ -133,14 +133,14 @@ export class AppController {
   }
 
   @Post('reservation/payment')
-  @ProcessPaymentSwagger()
-  processPayment(
-    @Body() processPaymentDto: ProcessPaymentReq,
-  ): Promise<ProcessPaymentRes> {
-    if (processPaymentDto.reservationId === 'invalid') {
+  @CompletePaymentSwagger()
+  completePayment(
+    @Body() completePaymentDto: CompletePaymentReq,
+  ): Promise<CompletePaymentRes> {
+    if (completePaymentDto.reservationId === 'invalid') {
       throw new NotFoundException('Invalid reservation ID');
     }
-    if (processPaymentDto.reservationId === 'duplicate') {
+    if (completePaymentDto.reservationId === 'duplicate') {
       throw new ConflictException(
         'Duplicate payment attempt. This reservation has already been paid for.',
       );

@@ -45,14 +45,14 @@ export class ReserveSeatRes {
   reservationId: string;
 }
 
-export class ProcessPaymentReq {
+export class CompletePaymentReq {
   @ApiProperty({ example: 'mock_reservation_abc123', description: '예약 ID' })
   reservationId: string;
 
   @ApiProperty({ example: 50000, description: '결제 금액' })
   amount: number;
 }
-export class ProcessPaymentRes {
+export class CompletePaymentRes {
   @ApiProperty({ example: 'mock_payment_abc123', description: '결제 ID' })
   paymentId: string;
 

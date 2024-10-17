@@ -4,16 +4,23 @@ import {
   ApiBody,
   ApiHeader,
   ApiOperation,
-  ApiResponse,
-  ApiQuery,
   ApiParam,
+  ApiQuery,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import {
-  EnterQueueReq,
-  ReserveSeatReq,
-  ProcessPaymentReq,
   ChargePointReq,
+  CompletePaymentReq,
+  CompletePaymentRes,
+  EnterQueueReq,
+  EnterQueueRes,
+  GetAvailableDatesRes,
+  GetAvailableSeatsRes,
+  GetPointRes,
+  GetQueuePositionRes,
+  ReserveSeatReq,
+  ReserveSeatRes,
 } from './dto';
 
 export function EnterQueueSwagger() {
@@ -27,6 +34,7 @@ export function EnterQueueSwagger() {
     ApiResponse({
       status: HttpStatus.CREATED,
       description: '토큰 발급 성공',
+      type: EnterQueueRes,
       schema: {
         type: 'object',
         properties: {
@@ -63,6 +71,7 @@ export function GetQueuePositionSwagger() {
     ApiResponse({
       status: HttpStatus.OK,
       description: '대기 번호 조회 성공',
+      type: GetQueuePositionRes,
       schema: {
         type: 'object',
         properties: {
@@ -92,6 +101,7 @@ export function GetAvailableDatesSwagger() {
     ApiResponse({
       status: HttpStatus.OK,
       description: '예약 가능 날짜 조회 성공',
+      type: GetAvailableDatesRes,
       schema: {
         type: 'array',
         items: { type: 'string', format: 'date' },
@@ -120,6 +130,7 @@ export function GetAvailableSeatsSwagger() {
     ApiResponse({
       status: HttpStatus.OK,
       description: '예약 가능 좌석 조회 성공',
+      type: GetAvailableSeatsRes,
       schema: {
         type: 'array',
         items: { type: 'number' },
@@ -147,6 +158,7 @@ export function ReserveSeatSwagger() {
     ApiResponse({
       status: HttpStatus.CREATED,
       description: '좌석 예약 성공',
+      type: ReserveSeatRes,
       schema: {
         type: 'object',
         properties: {
@@ -180,18 +192,19 @@ export function ReserveSeatSwagger() {
   );
 }
 
-export function ProcessPaymentSwagger() {
+export function CompletePaymentSwagger() {
   return applyDecorators(
     ApiTags('예약'),
     ApiOperation({ summary: '결제 처리' }),
     ApiBody({
-      type: ProcessPaymentReq,
+      type: CompletePaymentReq,
       description:
         '예약 ID가 "invalid"인 경우 유효하지 않은 예약으로 간주합니다. 예약 ID가 "duplicate"인 경우 결제 정보 생성 실패로 간주합니다.',
     }),
     ApiResponse({
       status: HttpStatus.CREATED,
       description: '결제 처리 성공',
+      type: CompletePaymentRes,
       schema: {
         type: 'object',
         properties: {
@@ -250,6 +263,7 @@ export function GetPointSwagger() {
     ApiResponse({
       status: HttpStatus.OK,
       description: '잔액 조회 성공',
+      type: GetPointRes,
       schema: {
         type: 'object',
         properties: {
@@ -283,6 +297,7 @@ export function ChargePointSwagger() {
     ApiResponse({
       status: HttpStatus.CREATED,
       description: '잔액 충전 성공',
+      type: ChargePointReq,
       schema: {
         type: 'object',
         properties: {
