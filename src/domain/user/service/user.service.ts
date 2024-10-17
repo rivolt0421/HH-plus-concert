@@ -1,17 +1,17 @@
-import { ConflictException, Inject, NotFoundException } from '@nestjs/common';
-import {
-  USER_READER_REPOSITORY,
-  UserReaderRepository,
-} from '../repository/user-reader.interface';
+import { ConflictException, Inject } from '@nestjs/common';
 import { User } from '../entity/user';
-import {
-  USER_WRITER_REPOSITORY,
-  UserWriterRepository,
-} from '../repository/user-writer.interface';
 import {
   POINT_HISTORY_WRITER_REPOSITORY,
   PointHistoryWriterRepository,
 } from '../repository/point-history-writer.interface';
+import {
+  USER_READER_REPOSITORY,
+  UserReaderRepository,
+} from '../repository/user-reader.interface';
+import {
+  USER_WRITER_REPOSITORY,
+  UserWriterRepository,
+} from '../repository/user-writer.interface';
 
 export class UserService {
   constructor(

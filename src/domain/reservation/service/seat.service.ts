@@ -12,7 +12,7 @@ export class SeatService {
     private readonly seatReader: SeatReaderRepository,
   ) {}
 
-  async assertNotOccupied(date: Date, seatNumber: number): Promise<Seat> {
+  async assertNotOccupied(date: string, seatNumber: number): Promise<Seat> {
     const seat = await this.seatReader.findByDateAndSeatNumberOrThrow(
       date,
       seatNumber,

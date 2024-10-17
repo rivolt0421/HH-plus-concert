@@ -5,7 +5,7 @@ export const RESERVATION_WRITER_REPOSITORY = Symbol(
 );
 export interface ReservationWriterRepository {
   saveWithSeatVersion(
-    reservation: Reservation,
+    reservation: Omit<Reservation, 'id'>,
     seatVersion: number,
   ): Promise<Reservation | null>;
 }

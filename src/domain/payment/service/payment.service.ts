@@ -4,7 +4,7 @@ import { Payment } from '../entity/payment';
 import {
   PAYMENT_WRITER_REPOSITORY,
   PaymentWriterRepository,
-} from '../repository/payment-writer.repository';
+} from '../repository/payment-writer.interface';
 
 export class PaymentService {
   constructor(

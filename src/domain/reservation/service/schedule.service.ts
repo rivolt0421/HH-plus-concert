@@ -16,7 +16,7 @@ export class ScheduleService {
   }
 
   async getAvailableSeats(date: string): Promise<Seat[]> {
-    const schedule = await this.scheduleReader.findByDate(date);
+    const schedule = await this.scheduleReader.findByDateOrThrow(date);
     return schedule.getAvailableSeats();
   }
 }
