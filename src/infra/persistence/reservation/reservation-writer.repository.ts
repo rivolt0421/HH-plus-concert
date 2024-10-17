@@ -2,7 +2,9 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
 import { Reservation } from 'src/domain/reservation/entity/reservation';
 import { ReservationWriterRepository } from 'src/domain/reservation/repository/reservation-writer.interface';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class ReservationWriterRepositoryImpl
   implements ReservationWriterRepository
 {

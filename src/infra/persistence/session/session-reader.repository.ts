@@ -1,7 +1,9 @@
 import { PrismaService } from 'src/database/prisma.service';
 import { Session } from 'src/domain/queue/entity/session';
 import { SessionReaderRepository } from 'src/domain/queue/repository/session-reader.interface';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class SessionReaderRepositoryImpl implements SessionReaderRepository {
   constructor(private readonly prisma: PrismaService) {}
 

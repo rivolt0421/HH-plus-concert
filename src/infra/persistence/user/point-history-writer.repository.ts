@@ -1,7 +1,9 @@
 import { PrismaService } from 'src/database/prisma.service';
 import { PointHistory } from 'src/domain/user/entity/point-history';
 import { PointHistoryWriterRepository } from 'src/domain/user/repository/point-history-writer.interface';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class PointHistoryWriterRepositoryImpl
   implements PointHistoryWriterRepository
 {

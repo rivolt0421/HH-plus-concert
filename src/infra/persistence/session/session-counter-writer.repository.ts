@@ -1,6 +1,8 @@
 import { PrismaService } from 'src/database/prisma.service';
 import { SessionCounterWriterRepository } from 'src/domain/queue/repository/session-counter-writer.interface';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class SessionCounterWriterRepositoryImpl
   implements SessionCounterWriterRepository
 {

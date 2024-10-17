@@ -3,7 +3,9 @@ import { Reservation } from 'src/domain/reservation/entity/reservation';
 import { Schedule } from 'src/domain/reservation/entity/schedule';
 import { Seat } from 'src/domain/reservation/entity/seat';
 import { ScheduleReaderRepository } from 'src/domain/reservation/repository/schedule-reader.interface';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class ScheduleReaderRepositoryImpl implements ScheduleReaderRepository {
   constructor(private readonly prisma: PrismaService) {}
 

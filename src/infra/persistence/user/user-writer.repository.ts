@@ -1,7 +1,9 @@
 import { PrismaService } from 'src/database/prisma.service';
 import { User } from 'src/domain/user/entity/user';
 import { UserWriterRepository } from 'src/domain/user/repository/user-writer.interface';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class UserWriterRepositoryImpl implements UserWriterRepository {
   constructor(private readonly prisma: PrismaService) {}
   incrementPoint(userId: number, amount: number): Promise<User | null> {

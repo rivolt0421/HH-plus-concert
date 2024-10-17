@@ -1,7 +1,9 @@
 import { PrismaService } from 'src/database/prisma.service';
 import { User } from 'src/domain/user/entity/user';
 import { UserReaderRepository } from 'src/domain/user/repository/user-reader.interface';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class UserReaderRepositoryImpl implements UserReaderRepository {
   constructor(private readonly prisma: PrismaService) {}
 
