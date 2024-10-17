@@ -1,10 +1,9 @@
 import { Global, Module } from '@nestjs/common';
-import { PrismaService } from './prisma.service';
 import { AsyncLocalStorage } from 'async_hooks';
+import { PrismaService } from './prisma.service';
 
 @Global()
 @Module({
-  imports: [],
   providers: [
     PrismaService,
     {

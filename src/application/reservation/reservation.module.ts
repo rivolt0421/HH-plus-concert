@@ -19,9 +19,11 @@ import { ReservationWriterRepositoryImpl } from 'src/infra/persistence/reservati
 import { PAYMENT_WRITER_REPOSITORY } from 'src/domain/payment/repository/payment-writer.interface';
 import { PaymentWriterRepositoryImpl } from 'src/infra/persistence/payment/payment-writer.repository';
 import { UserModule } from '../user/user.module';
+import { ReservationController } from 'src/api/reservation/reservation.controller';
 
 @Module({
   imports: [QueueModule, UserModule],
+  controllers: [ReservationController],
   providers: [
     // services
     ScheduleService,

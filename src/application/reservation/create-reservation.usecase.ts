@@ -37,6 +37,7 @@ export class CreateReservationUsecase {
 
     while (retries < maxRetries) {
       try {
+        // transaction
         const reservation = await this.prismaService.tx(async () => {
           const seat = await this.seatService.assertNotOccupied(
             date,

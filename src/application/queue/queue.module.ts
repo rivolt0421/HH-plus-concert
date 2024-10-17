@@ -13,6 +13,8 @@ import { SESSION_COUNTER_READER_REPOSITORY } from 'src/domain/queue/repository/s
 import { SessionCounterReaderRepositoryImpl } from 'src/infra/persistence/session/session-counter-reader.repository';
 import { SESSION_COUNTER_WRITER_REPOSITORY } from 'src/domain/queue/repository/session-counter-writer.interface';
 import { SessionCounterWriterRepositoryImpl } from 'src/infra/persistence/session/session-counter-writer.repository';
+import { QueueController } from 'src/api/queue/queue.controller';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -21,7 +23,9 @@ import { SessionCounterWriterRepositoryImpl } from 'src/infra/persistence/sessio
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1h' },
     }),
+    UserModule,
   ],
+  controllers: [QueueController],
   providers: [
     // services
     QueueService,

@@ -1,9 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import * as runtime from '@prisma/client/runtime/library.js';
 import { AsyncLocalStorage } from 'async_hooks';
-
-export type Transaction = Prisma.TransactionClient;
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
