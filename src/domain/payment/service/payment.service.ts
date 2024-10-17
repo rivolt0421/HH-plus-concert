@@ -4,7 +4,7 @@ import { Payment } from '../entity/payment';
 import {
   PAYMENT_WRITER_REPOSITORY,
   PaymentWriterRepository,
-} from '../repository/payment-writer.repository';
+} from '../repository/payment-writer.interface';
 
 export class PaymentService {
   constructor(
@@ -12,12 +12,12 @@ export class PaymentService {
     private readonly paymentWriter: PaymentWriterRepository,
   ) {}
 
-  async createPaid(amount: number): Promise<Payment> {
+  async createPaid(amount: number, paidAt: Date): Promise<Payment> {
     const payment: Payment = {
       id: 0,
       amount,
       status: 'PAID',
-      paidAt: new Date(),
+      paidAt,
     };
 
     return this.paymentWriter.save(payment);

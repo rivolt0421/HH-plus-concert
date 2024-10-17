@@ -5,5 +5,5 @@ export const POINT_HISTORY_WRITER_REPOSITORY = Symbol(
 );
 
 export interface PointHistoryWriterRepository {
-  save(pointHistory: Omit<PointHistory, 'id'>): Promise<void>;
+  save(pointHistory: Omit<PointHistory, 'id'>): Promise<PointHistory>;
 }

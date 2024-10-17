@@ -1,17 +1,17 @@
-import { ConflictException, Inject, NotFoundException } from '@nestjs/common';
-import {
-  USER_READER_REPOSITORY,
-  UserReaderRepository,
-} from '../repository/user-reader.interface';
+import { ConflictException, Inject } from '@nestjs/common';
 import { User } from '../entity/user';
-import {
-  USER_WRITER_REPOSITORY,
-  UserWriterRepository,
-} from '../repository/user-writer.interface';
 import {
   POINT_HISTORY_WRITER_REPOSITORY,
   PointHistoryWriterRepository,
 } from '../repository/point-history-writer.interface';
+import {
+  USER_READER_REPOSITORY,
+  UserReaderRepository,
+} from '../repository/user-reader.interface';
+import {
+  USER_WRITER_REPOSITORY,
+  UserWriterRepository,
+} from '../repository/user-writer.interface';
 
 export class UserService {
   constructor(
@@ -22,6 +22,10 @@ export class UserService {
     @Inject(POINT_HISTORY_WRITER_REPOSITORY)
     private readonly pointHistoryWriter: PointHistoryWriterRepository,
   ) {}
+
+  async findById(userId: number): Promise<User> {
+    return this.userReader.findByIdOrThrow(userId);
+  }
 
   async findByEmailAndPassword(email: string, password: string): Promise<User> {
     const user = await this.userReader.findByEmailAndPasswordOrThrow(
