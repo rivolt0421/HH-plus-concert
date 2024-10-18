@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { QueueManager } from '../entity/queue-manager';
 import { Session } from '../entity/session';
 import {
@@ -18,6 +18,7 @@ import {
   SessionWriterRepository,
 } from '../repository/session-writer.interface';
 
+@Injectable()
 export class QueueService {
   constructor(
     @Inject(SESSION_READER_REPOSITORY)

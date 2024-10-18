@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Reservation } from '../entity/reservation';
 import {
   RESERVATION_READER_REPOSITORY,
@@ -9,6 +9,7 @@ import {
   ReservationWriterRepository,
 } from '../repository/reservation-writer.interface';
 
+@Injectable()
 export class ReservationService {
   constructor(
     @Inject(RESERVATION_READER_REPOSITORY)

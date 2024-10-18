@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import { Payment } from '../entity/payment';
 import {
@@ -6,6 +6,7 @@ import {
   PaymentWriterRepository,
 } from '../repository/payment-writer.interface';
 
+@Injectable()
 export class PaymentService {
   constructor(
     @Inject(PAYMENT_WRITER_REPOSITORY)

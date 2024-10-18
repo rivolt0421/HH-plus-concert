@@ -1,10 +1,11 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Seat } from '../entity/seat';
 import {
   SEAT_READER_REPOSITORY,
   SeatReaderRepository,
 } from '../repository/seat-reader.interface';
 
+@Injectable()
 export class SeatService {
   constructor(
     @Inject(SEAT_READER_REPOSITORY)

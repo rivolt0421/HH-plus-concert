@@ -1,4 +1,4 @@
-import { ConflictException, Inject } from '@nestjs/common';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { User } from '../entity/user';
 import {
   POINT_HISTORY_WRITER_REPOSITORY,
@@ -13,6 +13,7 @@ import {
   UserWriterRepository,
 } from '../repository/user-writer.interface';
 
+@Injectable()
 export class UserService {
   constructor(
     @Inject(USER_READER_REPOSITORY)

@@ -1,10 +1,11 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Seat } from '../entity/seat';
 import {
   SCHEDULE_READER_REPOSITORY,
   ScheduleReaderRepository,
 } from '../repository/schedule-reader.interface';
 
+@Injectable()
 export class ScheduleService {
   constructor(
     @Inject(SCHEDULE_READER_REPOSITORY)
