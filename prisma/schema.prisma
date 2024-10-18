@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Schedule {
+  id   Int    @id @default(autoincrement())
+  date String
+
+  seats Seat[]
+}
+
+model Seat {
+  id         Int @id @default(autoincrement())
+  scheduleId Int
+  number     Int
+  price      Int
+  version    Int @default(1)
+
+  schedule     Schedule      @relation(fields: [scheduleId], references: [id])
+  reservations Reservation[]
+}
+
+model Reservation {
+  id          Int      @id @default(autoincrement())
+  seatId      Int
+  userId      Int
+  expiresAt   DateTime @db.Timestamptz()
+  paymentId   Int?     @unique
+  isCancelled Boolean  @default(false)
+
+  seat    Seat     @relation(fields: [seatId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
+  payment Payment?
+}
+
+model Payment {
+  id     Int      @id @default(autoincrement())
+  amount Int
+  status String
+  paidAt DateTime @db.Timestamptz()
+
+  reservation Reservation @relation(fields: [id], references: [paymentId])
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  point     Int
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  reservations   Reservation[]
+  pointHistories PointHistory[]
+  sessions       Session[]
+}
+
+model PointHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  amount    Int
+  type      String
+  createdAt DateTime @default(now()) @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Session {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  waitingNumber Int
+  expiresAt     DateTime @db.Timestamptz()
+  createdAt     DateTime @default(now()) @db.Timestamptz()
+  isTerminated  Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model SessionCounter {
+  id              Int @id @default(autoincrement())
+  createdCount    Int
+  terminatedCount Int
+}
