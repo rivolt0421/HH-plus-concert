@@ -30,7 +30,11 @@ export class ReservationWriterRepositoryImpl
       return (this.prisma.getTx() ?? this.prisma).reservation
         .create({
           data: {
-            ...reservation,
+            seatId: reservation.seatId,
+            userId: reservation.userId,
+            expiresAt: reservation.expiresAt,
+            paymentId: reservation.paymentId ?? null,
+            isCancelled: reservation.isCanceled,
           },
         })
         .then((reservation) => {

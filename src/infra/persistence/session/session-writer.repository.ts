@@ -10,7 +10,13 @@ export class SessionWriterRepositoryImpl implements SessionWriterRepository {
   save(session: Omit<Session, 'id'>): Promise<Session> {
     return (this.prisma.getTx() ?? this.prisma).session
       .create({
-        data: session,
+        data: {
+          userId: session.userId,
+          waitingNumber: session.waitingNumber,
+          expiresAt: session.expiresAt,
+          createdAt: session.createdAt,
+          isTerminated: session.isTerminated,
+        },
       })
       .then((session) => {
         return new Session(
