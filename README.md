@@ -114,21 +114,27 @@ sequenceDiagram
 **좌석 예약**
 ```mermaid
 sequenceDiagram
-    actor a as User
-    participant b as Server
-    participant c as DB
+  actor a as User
+  participant b as Server
+  participant c as DB
 
-    a->>b: 좌석 예약 요청 (날짜, 좌석 정보)
-    b->>c: 좌석 예약 상태 저장 (5분간 유효)
-    
-    alt 해당 좌석이 예약 가능한 경우
-        c-->>b: 저장 성공
-        b-->>a: 좌석 예약 성공 응답
-        
-    else 좌석이 이미 예약된 경우
-        c-->>b: 저장 실패
-        b-->>a: 좌석 예약 실패 응답
+  a ->> b: 좌석 예약 요청 (날짜, 좌석 번호)
+  Note over b: A
+  b ->> c: 해당 좌석의 예약 정보 조회
+  c -->> b: 예약 정보 반환
+  b ->> b: 유효한 예약이 하나라도 있는지 확인
+  alt 유효한 예약 존재하는 경우
+    b -->> a: Error - Seat is already occupied
+  else 유효한 예약 없는 경우
+    b ->> c: 5분간 유효한 예약 정보 저장 (w/ 좌석 버전)
+    alt 저장 성공
+        c -->> b: 저장 성공
+        b -->> a: 좌석 예약 성공 응답
+    else 저장 실패
+        c -->> b: 저장 실패
+        b ->> b: A 부터 다시 시도
     end
+  end
 ```
 
 **결제**
