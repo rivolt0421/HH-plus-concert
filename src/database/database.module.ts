@@ -10,6 +10,10 @@ import { PrismaService } from './prisma.service';
       provide: AsyncLocalStorage,
       useValue: new AsyncLocalStorage(),
     },
+    {
+      provide: 'PrismaClientOptions',
+      useValue: {},
+    },
   ],
   exports: [PrismaService],
 })

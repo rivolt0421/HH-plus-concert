@@ -1,5 +1,5 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Prisma, PrismaClient } from '@prisma/client';
 import * as runtime from '@prisma/client/runtime/library.js';
 import { AsyncLocalStorage } from 'async_hooks';
 
@@ -10,8 +10,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     UNIQUE_CONSTRAINT_FAILED: 'P2002',
   };
 
-  constructor(private readonly als: AsyncLocalStorage<Store>) {
-    super();
+  constructor(
+    @Inject('PrismaClientOptions')
+    private readonly config: Prisma.PrismaClientOptions,
+    private readonly als: AsyncLocalStorage<Store>,
+  ) {
+    super(config);
   }
 
   async onModuleInit() {
