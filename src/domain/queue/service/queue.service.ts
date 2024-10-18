@@ -35,9 +35,9 @@ export class QueueService {
     const waitingNumber =
       await this.sessionCounterWriter.increaseCreatedCount();
     const session = Session.of(userId, waitingNumber);
-    this.sessionWriter.save(session);
+    const savedSession = await this.sessionWriter.save(session);
 
-    return session;
+    return savedSession;
   }
 
   async getSession(sessionId: number): Promise<Session> {
