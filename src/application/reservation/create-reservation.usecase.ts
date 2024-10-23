@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectLogger } from 'src/common/logger/logger.decorator';
 import { PrismaService } from 'src/database/prisma.service';
 import { QueueService } from 'src/domain/queue/service/queue.service';
@@ -8,6 +8,8 @@ import { ReservationService } from 'src/domain/reservation/service/reservation.s
 import { SeatService } from 'src/domain/reservation/service/seat.service';
 import { UserService } from 'src/domain/user/service/user.service';
 import { Logger } from 'winston';
+import { HttpStatus } from '@nestjs/common';
+import { CustomException } from 'src/common/filters/global-exception.filter';
 
 @Injectable()
 export class CreateReservationUsecase {
@@ -34,7 +36,7 @@ export class CreateReservationUsecase {
 
       if (!isAccessible) {
         this.logger.warn('Not user turn', { sessionId });
-        throw new BadRequestException('Not your turn');
+        throw new UnauthorizedException('Not your turn');
       }
 
       const session = await this.queueService.getSession(sessionId);
@@ -72,7 +74,11 @@ export class CreateReservationUsecase {
         }
       }
 
-      throw new Error('Failed to create reservation after maximum retries');
+      throw new CustomException(
+        'Failed to create reservation after maximum retries',
+        HttpStatus.SERVICE_UNAVAILABLE,
+        { retries: maxRetries },
+      );
     } catch (error) {
       this.logger.error('Failed to create reservation', {
         error: error.message,

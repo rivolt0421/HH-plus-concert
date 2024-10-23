@@ -4,11 +4,13 @@ import { Schedule } from 'src/domain/reservation/entity/schedule';
 import { Seat } from 'src/domain/reservation/entity/seat';
 import { ScheduleReaderRepository } from 'src/domain/reservation/repository/schedule-reader.interface';
 import { Injectable } from '@nestjs/common';
+import { CatchPrismaNotFound } from 'src/common/decorators/catch-prisma.decorator';
 
 @Injectable()
 export class ScheduleReaderRepositoryImpl implements ScheduleReaderRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  @CatchPrismaNotFound('schedule')
   async findByDateOrThrow(date: string): Promise<Schedule> {
     const s = await (this.prisma.getTx() ?? this.prisma).schedule
       .findFirstOrThrow({

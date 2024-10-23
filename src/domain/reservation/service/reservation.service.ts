@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { Reservation } from '../entity/reservation';
 import {
   RESERVATION_READER_REPOSITORY,
@@ -31,7 +31,7 @@ export class ReservationService {
     );
 
     if (savedReservation === null) {
-      throw new Error('RESERVATION_FAILED');
+      throw new ConflictException('RESERVATION_FAILED');
     }
 
     return savedReservation;
@@ -52,7 +52,7 @@ export class ReservationService {
     );
 
     if (savedReservation === null) {
-      throw new Error('MARK_AS_PAID_FAILED');
+      throw new ConflictException('MARK_AS_PAID_FAILED');
     }
 
     return savedReservation;

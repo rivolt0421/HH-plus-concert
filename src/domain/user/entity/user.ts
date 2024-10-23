@@ -1,3 +1,5 @@
+import { BadRequestException } from '@nestjs/common';
+
 export class User {
   constructor(
     public readonly id: number,
@@ -12,7 +14,7 @@ export class User {
 
   validatePointUse(amount: number) {
     if (this._point < amount) {
-      throw new Error('Not enough point');
+      throw new BadRequestException('Not enough point');
     }
   }
 }
