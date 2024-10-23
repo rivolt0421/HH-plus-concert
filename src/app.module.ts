@@ -4,9 +4,10 @@ import { ReservationModule } from './application/reservation/reservation.module'
 import { UserModule } from './application/user/user.module';
 import { DatabaseModule } from './database/database.module';
 import { LoggerModule } from './common/logger/logger.module';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { HttpLoggingInterceptor } from './common/interceptors/http-logging.interceptor';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { AuthGuard } from './common/guards/auth.guard';
 
 @Module({
   imports: [
@@ -24,6 +25,10 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
     },
   ],
 })

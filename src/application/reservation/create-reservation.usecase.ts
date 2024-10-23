@@ -1,15 +1,13 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { CustomException } from 'src/common/filters/global-exception.filter';
 import { InjectLogger } from 'src/common/logger/logger.decorator';
 import { PrismaService } from 'src/database/prisma.service';
 import { QueueService } from 'src/domain/queue/service/queue.service';
-import { TokenService } from 'src/domain/queue/service/token.service';
 import { Reservation } from 'src/domain/reservation/entity/reservation';
 import { ReservationService } from 'src/domain/reservation/service/reservation.service';
 import { SeatService } from 'src/domain/reservation/service/seat.service';
 import { UserService } from 'src/domain/user/service/user.service';
 import { Logger } from 'winston';
-import { HttpStatus } from '@nestjs/common';
-import { CustomException } from 'src/common/filters/global-exception.filter';
 
 @Injectable()
 export class CreateReservationUsecase {
@@ -19,25 +17,16 @@ export class CreateReservationUsecase {
     private readonly reservationService: ReservationService,
     private readonly seatService: SeatService,
     private readonly userService: UserService,
-    private readonly tokenService: TokenService,
     private readonly queueService: QueueService,
   ) {}
 
   async execute(
     date: string,
     seatNumber: number,
-    token: string,
+    sessionId: number,
   ): Promise<Reservation> {
     try {
       this.logger.info('Creating reservation', { date, seatNumber });
-
-      const sessionId = await this.tokenService.getSessionId(token);
-      const isAccessible = await this.queueService.isAccessible(sessionId);
-
-      if (!isAccessible) {
-        this.logger.warn('Not user turn', { sessionId });
-        throw new UnauthorizedException('Not your turn');
-      }
 
       const session = await this.queueService.getSession(sessionId);
       const user = await this.userService.findById(session.userId);
