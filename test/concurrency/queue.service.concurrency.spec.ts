@@ -5,19 +5,18 @@ import {
   StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql';
 import { AsyncLocalStorage } from 'async_hooks';
-import { AppModule } from '../../app.module';
-import { PrismaService } from '../../database/prisma.service';
-import { EnterQueueUsecase } from './enter-queue.usecase';
-import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from 'src/constants/jwt';
+import { AppModule } from 'src/app.module';
+import { PrismaService } from 'src/database/prisma.service';
+import { QueueManager } from 'src/domain/queue/entity/queue-manager';
+import { QueueService } from 'src/domain/queue/service/queue.service';
 import { setupTestDatabase } from 'test/setup-test-database.util';
 
-describe('EnterQueueUsecase Integration Test', () => {
+describe('GetQueuePosition Concurrency Test', () => {
   let app: INestApplication;
-  let enterQueueUsecase: EnterQueueUsecase;
+  let queueService: QueueService;
   let container: StartedPostgreSqlContainer;
   let prisma: PrismaService;
-  let jwt: JwtService;
+
   beforeAll(async () => {
     container = await new PostgreSqlContainer()
       .withDatabase('test_db')
@@ -51,9 +50,8 @@ describe('EnterQueueUsecase Integration Test', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    enterQueueUsecase = moduleFixture.get<EnterQueueUsecase>(EnterQueueUsecase);
+    queueService = moduleFixture.get<QueueService>(QueueService);
     prisma = moduleFixture.get<PrismaService>(PrismaService);
-    jwt = moduleFixture.get<JwtService>(JwtService);
 
     await setupTestDatabase(DATABASE_URL);
   }, 20000);
@@ -91,20 +89,23 @@ describe('EnterQueueUsecase Integration Test', () => {
     ]);
   });
 
-  it('대기열 토큰을 발급받을 수 있다.', async () => {
-    const token = await enterQueueUsecase.execute(
-      'test@example.com',
-      'test1234',
+  it('수용 가능한 세션 수를 초과하는 요청이 들어오면 수용 가능한 세션 수만큼만 수용할 수 있다.', async () => {
+    const capacity = QueueManager.CAPACITY;
+    const sessionCount = capacity + 10; // Create more sessions than capacity
+
+    // Create multiple sessions
+    const sessions = await Promise.all(
+      Array.from({ length: sessionCount }, () => queueService.createSession(1)),
     );
 
-    expect(token).toBeDefined();
+    // Check accessibility concurrently
+    const results = await Promise.all(
+      sessions.map((session) => queueService.isAccessible(session.id)),
+    );
 
-    // 토큰 검증
-    await expect(async () => {
-      const payload = await jwt.verifyAsync<{ sessionId: number }>(token, {
-        secret: jwtConstants.secret,
-      });
-      expect(payload.sessionId).toBeDefined();
-    }).not.toThrow();
+    // Check that only up to capacity are accessible
+    const accessibleCount = results.filter((result) => !!result).length;
+    console.log(accessibleCount);
+    expect(accessibleCount).toBeLessThanOrEqual(capacity);
   });
 });

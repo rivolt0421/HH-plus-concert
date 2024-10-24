@@ -26,7 +26,7 @@ export class CreateReservationUsecase {
     sessionId: number,
   ): Promise<Reservation> {
     try {
-      this.logger.info('Creating reservation', { date, seatNumber });
+      this.logger.info('Creating reservation', { sessionId, date, seatNumber });
 
       const session = await this.queueService.getSession(sessionId);
       const user = await this.userService.findById(session.userId);
@@ -46,6 +46,7 @@ export class CreateReservationUsecase {
           });
 
           this.logger.verbose('Reservation created', {
+            sessionId,
             reservationId: reservation.id,
             userId: user.id,
             seatNumber,
@@ -55,6 +56,12 @@ export class CreateReservationUsecase {
           return reservation;
         } catch (error) {
           if (error.message === 'RESERVATION_FAILED') {
+            this.logger.warn('Reservation failed', {
+              sessionId,
+              error: error.message,
+              date,
+              seatNumber,
+            });
             retries++;
             await new Promise((resolve) => setTimeout(resolve, 100 * retries));
           } else {
@@ -70,6 +77,7 @@ export class CreateReservationUsecase {
       );
     } catch (error) {
       this.logger.error('Failed to create reservation', {
+        sessionId,
         error: error.message,
         date,
         seatNumber,
