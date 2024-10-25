@@ -1,5 +1,5 @@
 export class QueueManager {
-  readonly CAPACITY = 100;
+  static readonly CAPACITY = 100;
 
   constructor(
     private readonly createdCount: number,
@@ -7,7 +7,8 @@ export class QueueManager {
   ) {}
 
   getRemainingCount(waitingNumber: number): number {
-    const result = waitingNumber - (this.terminatedCount + this.CAPACITY);
+    const result =
+      waitingNumber - (this.terminatedCount + QueueManager.CAPACITY);
 
     return result <= 0 ? 0 : result;
   }

@@ -5,19 +5,22 @@ import {
   StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql';
 import { AsyncLocalStorage } from 'async_hooks';
-import { AppModule } from '../../app.module';
-import { PrismaService } from '../../database/prisma.service';
-import { EnterQueueUsecase } from './enter-queue.usecase';
-import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from 'src/constants/jwt';
+import { TokenService } from 'src/domain/queue/service/token.service';
 import { setupTestDatabase } from 'test/setup-test-database.util';
+import { AppModule } from '../../src/app.module';
+import { PrismaService } from '../../src/database/prisma.service';
+import { QueueManager } from '../../src/domain/queue/entity/queue-manager';
+import { EnterQueueUsecase } from 'src/application/queue/enter-queue.usecase';
+import { GetQueuePositionUsecase } from 'src/application/queue/get-queue-position.usecase';
 
-describe('EnterQueueUsecase Integration Test', () => {
+describe('GetQueuePosition Concurrency Test', () => {
   let app: INestApplication;
   let enterQueueUsecase: EnterQueueUsecase;
+  let getQueuePositionUsecase: GetQueuePositionUsecase;
+  let tokenService: TokenService;
   let container: StartedPostgreSqlContainer;
   let prisma: PrismaService;
-  let jwt: JwtService;
+
   beforeAll(async () => {
     container = await new PostgreSqlContainer()
       .withDatabase('test_db')
@@ -52,11 +55,14 @@ describe('EnterQueueUsecase Integration Test', () => {
     await app.init();
 
     enterQueueUsecase = moduleFixture.get<EnterQueueUsecase>(EnterQueueUsecase);
+    getQueuePositionUsecase = moduleFixture.get<GetQueuePositionUsecase>(
+      GetQueuePositionUsecase,
+    );
+    tokenService = moduleFixture.get<TokenService>(TokenService);
     prisma = moduleFixture.get<PrismaService>(PrismaService);
-    jwt = moduleFixture.get<JwtService>(JwtService);
 
     await setupTestDatabase(DATABASE_URL);
-  }, 20000);
+  }, 10000);
 
   afterAll(async () => {
     await app.close();
@@ -91,20 +97,41 @@ describe('EnterQueueUsecase Integration Test', () => {
     ]);
   });
 
-  it('대기열 토큰을 발급받을 수 있다.', async () => {
-    const token = await enterQueueUsecase.execute(
-      'test@example.com',
-      'test1234',
+  it('200개의 동시 요청에서 대기 번호가 순차적으로 증가해야 한다', async () => {
+    const capacity = QueueManager.CAPACITY; // CAPACITY 가져오기
+    const count = 200;
+
+    // 1. 토큰 발급 (200개의 동시 요청)
+    const tokens = await Promise.all(
+      Array.from({ length: count }, () =>
+        enterQueueUsecase.execute('test@example.com', 'test1234'),
+      ),
     );
 
-    expect(token).toBeDefined();
+    const sessionIds = await Promise.all(
+      tokens.map((token) => tokenService.getSessionId(token)),
+    );
 
-    // 토큰 검증
-    await expect(async () => {
-      const payload = await jwt.verifyAsync<{ sessionId: number }>(token, {
-        secret: jwtConstants.secret,
-      });
-      expect(payload.sessionId).toBeDefined();
-    }).not.toThrow();
+    // 2. 대기 번호 조회 (200개의 동시 요청)
+    const remainingCounts = await Promise.all(
+      sessionIds.map((sessionId) => getQueuePositionUsecase.execute(sessionId)),
+    );
+
+    // 3. 검증
+    const uniqueCounts = new Set(remainingCounts);
+
+    // 모든 대기 번호가 유니크해야 함
+    expect(uniqueCounts.size).toBe(count - capacity + 1);
+
+    // 대기 번호가 순차적으로 증가하는지 확인
+    const sortedCounts = [...uniqueCounts].sort((a, b) => a - b);
+    sortedCounts.forEach((count, index) => {
+      expect(count).toBe(index);
+    });
+
+    // 세션 카운터 검증
+    const counter = await prisma.sessionCounter.findFirst();
+    expect(counter?.createdCount).toBe(count);
+    expect(counter?.terminatedCount).toBe(0);
   });
 });
