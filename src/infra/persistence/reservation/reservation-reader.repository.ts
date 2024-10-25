@@ -1,7 +1,8 @@
+import { Injectable } from '@nestjs/common';
+import { CatchPrismaNotFound } from 'src/common/decorators/catch-prisma.decorator';
 import { PrismaService } from 'src/database/prisma.service';
 import { Reservation } from 'src/domain/reservation/entity/reservation';
 import { ReservationReaderRepository } from 'src/domain/reservation/repository/reservation-reader.interface';
-import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ReservationReaderRepositoryImpl
@@ -9,8 +10,9 @@ export class ReservationReaderRepositoryImpl
 {
   constructor(private readonly prisma: PrismaService) {}
 
-  findByIdOrThrow(id: number): Promise<Reservation> {
-    return (this.prisma.getTx() ?? this.prisma).reservation
+  @CatchPrismaNotFound('reservation')
+  async findByIdOrThrow(id: number): Promise<Reservation> {
+    return await (this.prisma.getTx() ?? this.prisma).reservation
       .findUniqueOrThrow({
         where: { id },
       })

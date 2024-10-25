@@ -52,7 +52,7 @@ export class CompletePaymentUsecase {
         return payment;
       } catch (error) {
         // TODO: 결제 취소 처리
-        throw new Error('COMPLETE_PAYMENT_FAILED');
+        throw error;
       }
     });
 

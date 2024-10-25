@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -10,13 +10,10 @@ export class TokenService {
   }
 
   async getSessionId(token: string): Promise<number> {
-    try {
-      const decoded = await this.jwtService.verifyAsync<{ sessionId: number }>(
-        token,
-      );
-      return decoded.sessionId;
-    } catch {
-      throw new UnauthorizedException();
-    }
+    const decoded = await this.jwtService.verifyAsync<{ sessionId: number }>(
+      token,
+    );
+
+    return decoded.sessionId;
   }
 }

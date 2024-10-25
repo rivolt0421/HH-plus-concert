@@ -5,7 +5,7 @@ import {
   Post,
   Query,
   Req,
-  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { CompletePaymentUsecase } from 'src/application/reservation/create-payment.usecase';
 import { GetAvailableDatesUsecase } from 'src/application/reservation/get-available-dates.usecase';
@@ -24,7 +24,8 @@ import {
   CompletePaymentReq,
   CompletePaymentRes,
 } from './dto/complete-payment.dto';
-
+import { QueueGuard } from 'src/common/guards/queue.guard';
+import { Request } from 'express';
 @Controller('reservation')
 export class ReservationController {
   constructor(
@@ -43,34 +44,27 @@ export class ReservationController {
   }
 
   @Get('seats/available')
+  @UseGuards(QueueGuard)
   @GetAvailableSeatsSwagger()
   async getAvailableSeats(
-    @Req() req: Request,
     @Query('date') date: string,
   ): Promise<GetAvailableSeatsRes> {
-    const token = this.extractTokenFromHeader(req);
-    if (!token) {
-      throw new UnauthorizedException('Invalid or expired token');
-    }
-    const seats = await this.getAvailableSeatsUsecase.execute(date, token);
+    const seats = await this.getAvailableSeatsUsecase.execute(date);
 
     return { seats };
   }
 
   @Post('seat')
+  @UseGuards(QueueGuard)
   @ReserveSeatSwagger()
   async reserveSeat(
     @Req() req: Request,
     @Body() reserveSeatDto: ReserveSeatReq,
   ): Promise<ReserveSeatRes> {
-    const token = this.extractTokenFromHeader(req);
-    if (!token) {
-      throw new UnauthorizedException('Invalid or expired token');
-    }
     const reservation = await this.createReservationUsecase.execute(
       reserveSeatDto.date,
       reserveSeatDto.seatNumber,
-      token,
+      req.sessionId,
     );
 
     return { reservationId: reservation.id };
@@ -91,11 +85,5 @@ export class ReservationController {
     );
 
     return { paymentId: payment.id, status: payment.status };
-  }
-
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const authHeader = request.headers.get('authorization');
-    const [type, token] = authHeader?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
   }
 }

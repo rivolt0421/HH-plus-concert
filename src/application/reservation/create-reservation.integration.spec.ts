@@ -12,6 +12,12 @@ import { PrismaService } from '../../database/prisma.service';
 import { EnterQueueUsecase } from '../queue/enter-queue.usecase';
 import { CreateReservationUsecase } from './create-reservation.usecase';
 import { GetAvailableSeatsUsecase } from './get-available-seats.usecase';
+import { AuthGuard } from '../../common/guards/auth.guard';
+import { ExecutionContext } from '@nestjs/common';
+import { Request } from 'express';
+import { TokenService } from '../../domain/queue/service/token.service';
+import { QueueGuard } from 'src/common/guards/queue.guard';
+import { QueueService } from 'src/domain/queue/service/queue.service';
 
 describe('CreateReservationUsecase Integration Test', () => {
   let app: INestApplication;
@@ -20,6 +26,10 @@ describe('CreateReservationUsecase Integration Test', () => {
   let createReservationUsecase: CreateReservationUsecase;
   let container: StartedPostgreSqlContainer;
   let prisma: PrismaService;
+  let tokenService: TokenService;
+  let queueService: QueueService;
+  let authGuard: AuthGuard;
+  let queueGuard: QueueGuard;
 
   beforeAll(async () => {
     container = await new PostgreSqlContainer()
@@ -62,6 +72,10 @@ describe('CreateReservationUsecase Integration Test', () => {
       CreateReservationUsecase,
     );
     prisma = moduleFixture.get<PrismaService>(PrismaService);
+    tokenService = moduleFixture.get<TokenService>(TokenService);
+    queueService = moduleFixture.get<QueueService>(QueueService);
+    authGuard = new AuthGuard(tokenService);
+    queueGuard = new QueueGuard(queueService);
 
     await setupTestDatabase(DATABASE_URL);
   }, 10000);
@@ -121,16 +135,42 @@ describe('CreateReservationUsecase Integration Test', () => {
       'test1234',
     );
 
+    // Mock Request 객체 생성
+    const mockRequest = {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    } as Request;
+
+    // AuthGuard를 통해 sessionId 설정
+    await authGuard.canActivate({
+      switchToHttp: () => ({
+        getRequest: () => mockRequest,
+      }),
+    } as ExecutionContext);
+
+    const sessionId = mockRequest.sessionId;
+
     // 2. 예약 가능한 좌석 조회
+    await queueGuard.canActivate({
+      switchToHttp: () => ({
+        getRequest: () => mockRequest,
+      }),
+    } as ExecutionContext);
     const date = '2024-01-01';
-    const availableSeats = await getAvailableSeatsUsecase.execute(date, token);
+    const availableSeats = await getAvailableSeatsUsecase.execute(date);
 
     // 3. 좌석 예약
+    await queueGuard.canActivate({
+      switchToHttp: () => ({
+        getRequest: () => mockRequest,
+      }),
+    } as ExecutionContext);
     const seat = availableSeats[0];
     const reservation = await createReservationUsecase.execute(
       date,
       seat.number,
-      token,
+      sessionId,
     );
 
     // 4. 예약 정보 검증

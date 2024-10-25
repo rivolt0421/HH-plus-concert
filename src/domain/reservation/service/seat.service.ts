@@ -1,4 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Seat } from '../entity/seat';
 import {
   SEAT_READER_REPOSITORY,
@@ -19,7 +24,7 @@ export class SeatService {
     );
 
     if (seat.isOccupied()) {
-      throw new Error('Seat is already occupied');
+      throw new ConflictException('Seat is already occupied');
     }
 
     return seat;
@@ -31,7 +36,7 @@ export class SeatService {
     const pendingReservation = seat.getPendingReservationOf(userId);
 
     if (pendingReservation === null) {
-      throw new Error('PENDING_RESERVATION_NOT_EXISTS');
+      throw new NotFoundException('PENDING_RESERVATION_NOT_EXISTS');
     }
 
     return seat;
